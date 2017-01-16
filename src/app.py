@@ -16,7 +16,8 @@ class Crawler:
 
     products_for_watch = [{
         "url": "https://amazon.co.uk/Philips-Ambiance-Wireless-Lighting-Starter/dp/B01K1WP7Z4/ref=sr_1_5?s=lighting&ie=UTF8&qid=1483999019&sr=1-5",
-        "startingPrice": 149.99
+        "startingPrice": 149.99,
+        "to": ["mark.tattersall@gmail.com"]
     }]
 
     def crawl(self):
@@ -43,12 +44,14 @@ class Crawler:
                 print(message)
             messages.append(message + '\r\n')
 
-        email_message = ", ".join(messages)
-        self.send_email(email_message)
+            email_message = ", ".join(messages)
+            for email_address in product.get("to"):
+                to_address = email_address
+                self.send_email(to_address, email_message)
 
     #<span id="priceblock_ourprice" class="a-size-medium a-color-price">£49.99</span>
 
-    def send_email(self, message):
+    def send_email(self, to_address, message):
         from_address = "markvtattersall@hotmail.com"
         pwd = 'shee2Fon'
         to_address = "mark.tattersall@gmail.com"
@@ -68,13 +71,12 @@ class Crawler:
         server.sendmail(sender, recipients, msg.as_string())
 
     def run(self):
-        self.crawl()
+        #self.crawl()
+        schedule.every().day.at("08:00").do(self.crawl,'It is 08:00')
 
-        #schedule.every().day.at("08:00").do(self.crawl,'It is 08:00')
-
-        #while True:
-        #    schedule.run_pending()
-        #    time.sleep(60)
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
 
 
 if __name__ == "__main__" :
